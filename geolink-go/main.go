@@ -31,7 +31,7 @@ func startCronJobs(cronScheduler *cron.Cron, keyValueStore *infrastructure.KeyVa
 	cronJobCtx := context.Background()
 
 	captchaCronJob := cronjob.NewDataBaseSyncCronJob(keyValueStore)
-	_, errCron := cronScheduler.AddFunc(util.CronSpecEveryOneMin, func() {
+	_, errCron := cronScheduler.AddFunc(util.CronSpecWeekly, func() {
 		captchaCronJob.Run(cronJobCtx)
 	})
 
