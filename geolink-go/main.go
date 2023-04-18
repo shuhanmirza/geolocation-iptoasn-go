@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"geolink-go/api/service"
+	"geolink-go/api/structs"
 	"geolink-go/cronjob"
 	"geolink-go/infrastructure"
 	"geolink-go/util"
@@ -19,9 +20,25 @@ func main() {
 
 	keyValueStore := infrastructure.NewKeyValueStore()
 
-	service.NewGeoDataService(&keyValueStore)
+	geoDataService := service.NewGeoDataService(&keyValueStore)
 
 	startCronJobs(cronScheduler, &keyValueStore)
+
+	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
+		IpAddress: "2a00:1728:1e:ffff:ffff:ffff:ffff:fffa",
+	})
+
+	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
+		IpAddress: "221.15.2.2",
+	})
+
+	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
+		IpAddress: "221.15.255.255",
+	})
+
+	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
+		IpAddress: "103.84.159.230",
+	})
 
 	d, _ := time.ParseDuration("100m")
 	time.Sleep(d)

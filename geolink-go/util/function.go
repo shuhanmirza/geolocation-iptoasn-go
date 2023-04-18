@@ -56,20 +56,13 @@ func UnzipFileGz(compressedFilename string, filename string) (err error) {
 	return err
 }
 
-func ipv6ToInt(IPv6Addr net.IP) *big.Int {
-	IPv6Int := big.NewInt(0)
-	IPv6Int.SetBytes(IPv6Addr)
-	return IPv6Int
+func Ip2Int(ip net.IP) *big.Int {
+	i := big.NewInt(0)
+	i.SetBytes(ip)
+	return i
 }
 
-func ip2int(ip net.IP) uint32 {
-	if len(ip) == 16 {
-		panic("no sane way to convert ipv6 into uint32")
-	}
-	return binary.BigEndian.Uint32(ip)
-}
-
-func int2ip(nn uint32) net.IP {
+func Int2ip(nn uint32) net.IP {
 	ip := make(net.IP, 4)
 	binary.BigEndian.PutUint32(ip, nn)
 	return ip
@@ -86,5 +79,20 @@ func ReadCsvFile(csvFileName string) (records [][]string, err error) {
 
 	// read CSV file
 	fileReader := csv.NewReader(fd)
+	return fileReader.ReadAll()
+}
+
+func ReadTsvFile(tsvFileName string) (records [][]string, err error) {
+	// open TSV file
+	fd, err := os.Open(tsvFileName)
+	if err != nil {
+		return records, err
+	}
+
+	defer fd.Close()
+
+	// read CSV file
+	fileReader := csv.NewReader(fd)
+	fileReader.Comma = '\t'
 	return fileReader.ReadAll()
 }
