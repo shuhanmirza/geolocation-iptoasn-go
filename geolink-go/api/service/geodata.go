@@ -1,13 +1,20 @@
 package service
 
 import (
+	"encoding/json"
+	"geolink-go/api/structs"
 	"geolink-go/infrastructure"
 	"geolink-go/util"
 	"log"
+	"math/big"
+	"net"
+	"sort"
+	"time"
 )
 
 type GeoDataService struct {
-	keyValueStore *infrastructure.KeyValueStore
+	keyValueStore     *infrastructure.KeyValueStore
+	startingIpNumList []*big.Int
 }
 
 func NewGeoDataService(keyValueStore *infrastructure.KeyValueStore) GeoDataService {
@@ -15,22 +22,97 @@ func NewGeoDataService(keyValueStore *infrastructure.KeyValueStore) GeoDataServi
 		keyValueStore: keyValueStore,
 	}
 
-	go service.loadKeyValueStore()
+	service.loadKeyValueStore()
 
 	return service
 }
 
-func (s GeoDataService) loadKeyValueStore() {
-	log.Println("GeoDataService: starting loading csv file")
+func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (response structs.GetGeoDataResponse, err error) {
 
-	records, err := util.ReadCsvFile(util.GeoWhoisAsnCountryIpv4NumDatabaseFilename)
+	startTime := time.Now().Nanosecond()
+
+	ipAddressInt := util.Ip2Int(net.ParseIP(request.IpAddress))
+
+	log.Println(ipAddressInt)
+
+	startingIpAddress := s.findNearestStartingIp(s.startingIpNumList, ipAddressInt)
+
+	geoDataString := s.keyValueStore.Get(startingIpAddress.String())
+
+	log.Println(geoDataString)
+
+	var geoData infrastructure.GeoDataModel
+	_ = json.Unmarshal([]byte(geoDataString), &geoData)
+
+	log.Printf("ip range %s - %s\n", util.Int2ip(uint32(geoData.IpRangeStart.Int64())), util.Int2ip(uint32(geoData.IpRangeEnd.Int64())))
+
+	log.Printf("time required %d\n", time.Now().Nanosecond()-startTime)
+
+	return response, nil
+}
+
+func (s *GeoDataService) findNearestStartingIp(ipList []*big.Int, candidate *big.Int) (startingIp *big.Int) {
+
+	lenList := len(ipList)
+
+	if lenList < 10 {
+		log.Println(ipList)
+	}
+
+	if lenList <= 2 {
+		if candidate.Cmp(ipList[1]) >= 0 {
+			return ipList[1]
+		}
+		return ipList[0]
+	}
+
+	if ipList[lenList/2].Cmp(candidate) == 0 {
+		return ipList[lenList/2]
+	} else if ipList[lenList/2].Cmp(candidate) == -1 {
+		return s.findNearestStartingIp(ipList[lenList/2:lenList], candidate)
+	} else {
+		return s.findNearestStartingIp(ipList[0:lenList/2], candidate)
+	}
+
+}
+
+func (s *GeoDataService) loadKeyValueStore() {
+	log.Println("GeoDataService: starting loading database files")
+
+	records, err := util.ReadTsvFile(util.IpToAsnCombinedDatabaseFilename)
 	if err != nil {
-		log.Println("GeoDataService: error while loading csv file")
+		log.Printf("GeoDataService: error while loading %s\n", util.IpToAsnCombinedDatabaseFilename)
 		log.Println(err)
 		return
 	}
 
-	log.Println("GeoDataService: csv file loaded successfully")
+	for _, record := range records {
+		startingIpString := record[0]
+		endingIpString := record[1]
+		asnString := record[2]
+		countryCodeString := record[3]
+		asnDescriptionString := record[4]
 
-	log.Println(len(records))
+		startingIpInt := util.Ip2Int(net.ParseIP(startingIpString))
+		endingIpInt := util.Ip2Int(net.ParseIP(endingIpString))
+
+		s.startingIpNumList = append(s.startingIpNumList, startingIpInt)
+
+		data := infrastructure.GeoDataModel{
+			IpRangeStart:   startingIpInt,
+			IpRangeEnd:     endingIpInt,
+			Asn:            asnString,
+			AsnDescription: asnDescriptionString,
+			CountryCode:    countryCodeString,
+		}
+		dataString, _ := json.Marshal(data)
+
+		s.keyValueStore.Set(startingIpInt.String(), string(dataString))
+	}
+
+	sort.Slice(s.startingIpNumList, func(i, j int) bool {
+		return s.startingIpNumList[i].Cmp(s.startingIpNumList[j]) < 0
+	})
+
+	log.Printf("GeoDataService: database loading completed | number of item: %d\n", len(s.startingIpNumList))
 }
