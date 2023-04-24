@@ -9,7 +9,6 @@ import (
 	"math/big"
 	"net"
 	"sort"
-	"time"
 )
 
 type GeoDataService struct {
@@ -29,37 +28,44 @@ func NewGeoDataService(keyValueStore *infrastructure.KeyValueStore) GeoDataServi
 
 func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (response structs.GetGeoDataResponse, err error) {
 
-	startTime := time.Now().Nanosecond()
+	//startTime := time.Now().Nanosecond()
 
 	ipAddressInt := util.Ip2Int(net.ParseIP(request.IpAddress))
 
-	log.Println(ipAddressInt)
+	//log.Printf("requested ip=%s | ipint=%d\n", request.IpAddress, ipAddressInt)
 
 	startingIpAddress := s.findNearestStartingIp(s.startingIpNumList, ipAddressInt)
 
 	geoDataString := s.keyValueStore.Get(startingIpAddress.String())
 
-	log.Println(geoDataString)
+	//log.Println(geoDataString)
 
 	var geoData infrastructure.GeoDataModel
 	_ = json.Unmarshal([]byte(geoDataString), &geoData)
 
-	log.Printf("ip range %s - %s\n", util.Int2ip(uint32(geoData.IpRangeStart.Int64())), util.Int2ip(uint32(geoData.IpRangeEnd.Int64())))
+	//log.Printf("ip range %s - %s\n", util.Int2ip(uint32(geoData.IpRangeStart.Int64())), util.Int2ip(uint32(geoData.IpRangeEnd.Int64())))
 
-	log.Printf("time required %d\n", time.Now().Nanosecond()-startTime)
+	//log.Printf("time required %d\n", time.Now().Nanosecond()-startTime)
 
-	return response, nil
+	return structs.GetGeoDataResponse{
+		CountryCode:    geoData.CountryCode,
+		Asn:            geoData.Asn,
+		AsnDescription: geoData.AsnDescription,
+		IpAddress:      request.IpAddress,
+	}, nil
 }
 
 func (s *GeoDataService) findNearestStartingIp(ipList []*big.Int, candidate *big.Int) (startingIp *big.Int) {
 
 	lenList := len(ipList)
 
-	if lenList < 10 {
-		log.Println(ipList)
-	}
+	//if lenList < 10 {
+	//	log.Println(ipList)
+	//}
 
-	if lenList <= 2 {
+	if lenList == 1 {
+		return ipList[0]
+	} else if lenList == 2 {
 		if candidate.Cmp(ipList[1]) >= 0 {
 			return ipList[1]
 		}

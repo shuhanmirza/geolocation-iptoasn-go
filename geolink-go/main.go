@@ -20,12 +20,12 @@ func main() {
 
 	keyValueStore := infrastructure.NewKeyValueStore()
 
-	geoDataService := service.NewGeoDataService(&keyValueStore)
+	geoDataService := service.NewGeoDataService(keyValueStore)
 
-	startCronJobs(cronScheduler, &keyValueStore)
+	startCronJobs(cronScheduler, keyValueStore)
 
 	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
-		IpAddress: "2a00:1728:1e:ffff:ffff:ffff:ffff:fffa",
+		IpAddress: "1.0.16.1",
 	})
 
 	geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
