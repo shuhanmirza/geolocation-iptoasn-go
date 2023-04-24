@@ -22,6 +22,8 @@ func (cj DatabaseSyncCronJob) Run(_ context.Context) {
 
 	cj.downloadDatabase(util.IpToAsnCombinedDatabaseUrl, util.IpToAsnCombinedDatabaseCompressedFilename)
 	cj.unzipDatabaseGz(util.IpToAsnCombinedDatabaseCompressedFilename, util.IpToAsnCombinedDatabaseFilename)
+
+	//TODO: Reinitialize the kvstore and binaryList
 }
 
 func (cj DatabaseSyncCronJob) downloadDatabase(databaseUrlString string, databaseFilename string) {
