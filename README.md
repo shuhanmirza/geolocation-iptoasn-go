@@ -1,4 +1,5 @@
 # geolocation-iptoasn-go
+<img src="https://img.shields.io/github/issues/shuhanmirza/geolocation-iptoasn-go.svg?style=for-the-badge">
 
 Webservice for getting geolocation and ASN information from IP addresses. This service can be easily run using docker.
 It has been implemented using Golang Gin Gonic.
