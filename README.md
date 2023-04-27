@@ -1,10 +1,11 @@
-# geo.surel.ink
-Geo Location Detection API Service
+# geolocation-iptoasn-go
 
+Webservice for getting geolocation and ASN information from IP addresses. This service can be easily run using docker.
+It has been implemented using Golang Gin Gonic. 
 
-https://github.com/sapics/ip-location-db
-https://github.com/realchandan/Ip-geo-API/blob/master/cron.sh
-https://github.com/annexare/Countries
-https://iptoasn.com/
-https://gist.github.com/jniltinho/e4d04e6fdfa02ae7a0ee011d3d19d204
-https://gophercoding.com/download-a-file/
+The source of the dataset is https://iptoasn.com/. However, you can easily integrate any database of your liking.
+
+### Acknowledgement
+- https://github.com/jedisct1/iptoasn-webservice
+- https://iptoasn.com/
+- https://github.com/sapics/ip-location-db
