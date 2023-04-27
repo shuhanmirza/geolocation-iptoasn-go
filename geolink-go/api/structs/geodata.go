@@ -7,6 +7,6 @@ type GetGeoDataRequest struct {
 type GetGeoDataResponse struct {
 	Ip             string `json:"ip"`
 	Country        string `json:"country"`
-	Asn            string `json:"asn"`
+	AsnNumber      string `json:"asn_number"`
 	AsnDescription string `json:"asn_description"`
 }

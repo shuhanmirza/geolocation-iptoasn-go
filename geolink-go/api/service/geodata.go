@@ -49,7 +49,7 @@ func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (respon
 
 	return structs.GetGeoDataResponse{
 		Country:        geoData.CountryCode,
-		Asn:            geoData.Asn,
+		AsnNumber:      geoData.Asn,
 		AsnDescription: geoData.AsnDescription,
 		Ip:             request.Ip,
 	}, nil
