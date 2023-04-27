@@ -1,0 +1,10 @@
+version: '3.1'
+services:
+  geolink-go:
+    build:
+      context: .
+      dockerfile: dockerFile/GoDockerFile
+    restart: unless-stopped
+    container_name: geolink-go
+    ports:
+      - "9000:9000"

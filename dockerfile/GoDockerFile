@@ -1,0 +1,16 @@
+FROM golang:1.19.2-alpine3.16
+
+RUN mkdir /app
+
+WORKDIR /app
+
+ADD geolink-go/ .
+
+RUN go mod download
+RUN go build -o main main.go
+
+ENV GIN_MODE=release
+
+EXPOSE 9000
+
+CMD ["./main"]
