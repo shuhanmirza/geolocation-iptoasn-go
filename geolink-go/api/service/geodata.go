@@ -28,24 +28,24 @@ func NewGeoDataService(keyValueStore *infrastructure.KeyValueStore) GeoDataServi
 
 func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (response structs.GetGeoDataResponse, err error) {
 
-	//startTime := time.Now().Nanosecond()
+	ipAddressNet := net.ParseIP(request.Ip)
 
-	ipAddressInt := util.Ip2Int(net.ParseIP(request.Ip))
+	if ipAddressNet.IsPrivate() {
+		return response, &util.NotPublicIp{}
+	}
 
-	//log.Printf("requested ip=%s | ipint=%d\n", request.Ip, ipAddressInt)
-
+	ipAddressInt := util.Ip2Int(ipAddressNet)
 	startingIpAddress := s.findNearestStartingIp(s.startingIpNumList, ipAddressInt)
 
 	geoDataString := s.keyValueStore.Get(startingIpAddress.String())
-
-	//log.Println(geoDataString)
-
 	var geoData infrastructure.GeoDataModel
 	_ = json.Unmarshal([]byte(geoDataString), &geoData)
 
-	//log.Printf("ip range %s - %s\n", util.Int2ip(uint32(geoData.IpRangeStart.Int64())), util.Int2ip(uint32(geoData.IpRangeEnd.Int64())))
-
-	//log.Printf("time required %d\n", time.Now().Nanosecond()-startTime)
+	if ipAddressInt.Cmp(geoData.IpRangeEnd) == 1 {
+		return response, &util.RecordNotFound{}
+	} else if geoData.CountryCode == "None" {
+		return response, &util.RecordNotFound{}
+	}
 
 	return structs.GetGeoDataResponse{
 		Country:        geoData.CountryCode,
@@ -58,10 +58,6 @@ func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (respon
 func (s *GeoDataService) findNearestStartingIp(ipList []*big.Int, candidate *big.Int) (startingIp *big.Int) {
 
 	lenList := len(ipList)
-
-	//if lenList < 10 {
-	//	log.Println(ipList)
-	//}
 
 	if lenList == 1 {
 		return ipList[0]
