@@ -1,12 +1,12 @@
 package structs
 
 type GetGeoDataRequest struct {
-	IpAddress string `json:"ip_address"`
+	Ip string `form:"ip" json:"ip" binding:"required"`
 }
 
 type GetGeoDataResponse struct {
-	IpAddress      string `json:"ip_address"`
-	CountryCode    string `json:"country_code"`
+	Ip             string `json:"ip"`
+	Country        string `json:"country"`
 	Asn            string `json:"asn"`
 	AsnDescription string `json:"asn_description"`
 }

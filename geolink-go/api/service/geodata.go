@@ -30,9 +30,9 @@ func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (respon
 
 	//startTime := time.Now().Nanosecond()
 
-	ipAddressInt := util.Ip2Int(net.ParseIP(request.IpAddress))
+	ipAddressInt := util.Ip2Int(net.ParseIP(request.Ip))
 
-	//log.Printf("requested ip=%s | ipint=%d\n", request.IpAddress, ipAddressInt)
+	//log.Printf("requested ip=%s | ipint=%d\n", request.Ip, ipAddressInt)
 
 	startingIpAddress := s.findNearestStartingIp(s.startingIpNumList, ipAddressInt)
 
@@ -48,10 +48,10 @@ func (s *GeoDataService) GetIpGeoData(request structs.GetGeoDataRequest) (respon
 	//log.Printf("time required %d\n", time.Now().Nanosecond()-startTime)
 
 	return structs.GetGeoDataResponse{
-		CountryCode:    geoData.CountryCode,
+		Country:        geoData.CountryCode,
 		Asn:            geoData.Asn,
 		AsnDescription: geoData.AsnDescription,
-		IpAddress:      request.IpAddress,
+		Ip:             request.Ip,
 	}, nil
 }
 

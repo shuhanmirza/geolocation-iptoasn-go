@@ -9,3 +9,4 @@ const IpToAsnCombinedDatabaseCompressedFilename = "assets/ip2asn-combined.tsv.gz
 const IpToAsnCombinedDatabaseFilename = "assets/ip2asn-combined.tsv"
 const CronSpecEveryOneMin = "* * * * *"
 const CronSpecWeekly = "@weekly"
+const ServerAddress = "0.0.0.0:9000"

@@ -10,13 +10,13 @@ func TestGeoDataService_GetIpGeoDataV0(t *testing.T) {
 	ipLocation := "BD"
 
 	data, err := geoDataService.GetIpGeoData(structs.GetGeoDataRequest{
-		IpAddress: ipAddress,
+		Ip: ipAddress,
 	})
 	if err != nil {
 		t.Errorf("unexpected error %s", err.Error())
 	}
-	if data.CountryCode != ipLocation {
-		t.Errorf(" location of %s is %s but found %s", ipAddress, ipLocation, data.CountryCode)
+	if data.Country != ipLocation {
+		t.Errorf(" location of %s is %s but found %s", ipAddress, ipLocation, data.Country)
 	}
 }
 
@@ -37,13 +37,13 @@ func TestGeoDataService_GetIpGeoData(t *testing.T) {
 
 			for ipInt := startIpInt; ipInt <= endIpInt; ipInt++ {
 				ipAddress := util.Int2ip(uint32(ipInt))
-				geoDataResponse, _ := geoDataService.GetIpGeoData(structs.GetGeoDataRequest{IpAddress: ipAddress.String()})
-				if geoDataResponse.CountryCode == "None" {
+				geoDataResponse, _ := geoDataService.GetIpGeoData(structs.GetGeoDataRequest{Ip: ipAddress.String()})
+				if geoDataResponse.Country == "None" {
 					notFoundCount = notFoundCount.Add(notFoundCount, big.NewInt(1))
-				} else if strings.Compare(geoDataResponse.CountryCode, countryCode) != 0 {
+				} else if strings.Compare(geoDataResponse.Country, countryCode) != 0 {
 					failedCount = failedCount.Add(failedCount, big.NewInt(1))
 
-					//log.Printf("failed | found=%s expected=%s\n", geoDataResponse.CountryCode, countryCode)
+					//log.Printf("failed | found=%s expected=%s\n", geoDataResponse.Country, countryCode)
 				} else {
 					successfulCount = successfulCount.Add(successfulCount, big.NewInt(1))
 				}
