@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGeoDataService_GetIpGeoDataV0(t *testing.T) {
+func TestGeoDataService_GetIpGeoData(t *testing.T) {
 	ipAddress := "103.84.159.230"
 	ipLocation := "BD"
 
@@ -20,7 +20,7 @@ func TestGeoDataService_GetIpGeoDataV0(t *testing.T) {
 	}
 }
 
-func TestGeoDataService_GetIpGeoData(t *testing.T) {
+func TestGeoDataService_GetIpGeoDataWithExistingDataset(t *testing.T) {
 
 	/*	commented out on purpose. uncomment when needed. this test requires more than 3 hours to complete
 
