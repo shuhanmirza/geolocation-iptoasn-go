@@ -7,7 +7,7 @@ It has been implemented using Golang Gin Gonic.
 
 The source of the database is https://iptoasn.com/. The service has a scheduler that downloads the database every week. However, you can easily integrate any database of your liking.
 
-This service loads database into memory and uses binary search to get desired data. It requires around `400MB` of memory.
+This service loads the database into memory and uses binary search to get desired data. You can connect the `KeyValueStore` struct to any database of your liking if you have a bigger database of GeoIp Information.
 
 ### Usage
 
